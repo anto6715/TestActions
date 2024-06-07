@@ -1,0 +1,32 @@
+name: Test Workflow
+
+on:
+  push:
+    paths:
+      - 'README.md'
+
+jobs:
+  check-pr:
+    runs-on: ubuntu-latest
+    outputs:
+      pr_found: ${{ steps.check.outputs.pr_found }}
+      pr_number: ${{ steps.check.outputs.pr_number }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: 8BitJonny/gh-get-current-pr@3.0.0
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: check-pr
+    if: needs.check-pr.outputs.pr_found == 'true'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run Tests
+        run: echo "Running tests for PR ${{ needs.check-pr.outputs.pr_number }}"
