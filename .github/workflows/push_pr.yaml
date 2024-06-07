@@ -9,9 +9,9 @@ jobs:
   push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          path: ${{ github.ref_name }}
 
       - uses: 8BitJonny/gh-get-current-pr@3.0.0
         id: PR
