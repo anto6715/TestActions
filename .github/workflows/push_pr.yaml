@@ -6,20 +6,25 @@ on:
       - 'README.md'
 
 jobs:
-  check_pr:
+  push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
         with:
-          path: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - uses: 8BitJonny/gh-get-current-pr@3.0.0
         id: PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  yedy_echo:
+  run-tests:
     runs-on: ubuntu-latest
-    needs: check_pr
-    if: needs.check_pr.PR.outputs.pr_found == 'true'
+    needs: push
+    if: needs.push.outputs.pr_found == 'true'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Run Tests
-        run: echo "Running tests for PR"
+        run: echo "Running tests for PR #${{ needs.push.outputs.pr_number }}"
