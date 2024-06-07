@@ -1,18 +1,26 @@
-name: 38 - Get PR Number on PUSH event
+name: Test Workflow
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - 'specific/path/**'
 
 jobs:
   push:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }}
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
       - name: Get Pull Request Number
         id: pr
-        run: echo "::set-output name=pull_request_number::$(gh pr view --json number -q .number || echo "")"
+        run: |
+          PR_NUMBER=$(gh pr view --json number -q .number || echo "")
+          echo "::set-output name=pull_request_number::$PR_NUMBER"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: echo ${{ steps.pr.outputs.pull_request_number }}
+
+      - name: Run Tests
+        if: ${{ steps.pr.outputs.pull_request_number != '' }}
+        run: echo "Running tests for PR #${{ steps.pr.outputs.pull_request_number }}"
