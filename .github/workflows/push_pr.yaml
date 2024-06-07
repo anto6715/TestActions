@@ -23,4 +23,4 @@ jobs:
 
       - name: Run Tests
         if: ${{ steps.pr.outputs.pull_request_number != '' }}
-        run: echo "Running tests for PR #${{ steps.pr.outputs.pull_request_number }}"
+        run: echo "Running tests for PR"
