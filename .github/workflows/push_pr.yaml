@@ -1,26 +1,33 @@
+
 name: Test Workflow
 
 on:
-  pull_request:
+  push:
     paths:
       - 'README.md'
 
 jobs:
-  push:
+  check-pr:
     runs-on: ubuntu-latest
+    outputs:
+      pr_found: ${{ steps.check.outputs.pr_found }}
+      pr_number: ${{ steps.check.outputs.pr_number }}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Get Pull Request Number
-        id: pr
-        run: |
-          PR_NUMBER=$(gh pr view --json number -q .number || echo "")
-          echo "::set-output name=pull_request_number::$PR_NUMBER"
+      - uses: 8BitJonny/gh-get-current-pr@3.0.0
+        id: check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: check-pr
+    if: needs.check-pr.outputs.pr_found == 'true'
+    steps:
+      - uses: actions/checkout@v2
+
       - name: Run Tests
-        if: ${{ steps.pr.outputs.pull_request_number != '' }}
-        run: echo "Running tests for PR"
+        run: echo "Running tests for PR ${{ needs.check-pr.outputs.pr_number }}"
