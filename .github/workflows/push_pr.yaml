@@ -19,7 +19,7 @@ jobs:
   yedy_echo:
     runs-on: ubuntu-latest
     needs: check_pr
-    if: check_pr.PR.outputs.pr_found == 'true'
+    if: needs.check_pr.PR.outputs.pr_found == 'true'
     steps:
       - name: Run Tests
         run: echo "Running tests for PR"
